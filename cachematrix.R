@@ -14,9 +14,9 @@ makeCacheMatrix <- function(x = matrix()) {
                 x <<- y
                 inv <<- NULL
         }
-        get = function() x
-        setinv = function(inverse) inv <<- inverse 
-        getinv = function() inv
+        get <- function() x
+        setinv <- function(inverse) inv <<- inverse 
+        getinv <- function() inv
         list(set=set, get=get, setinv=setinv, getinv=getinv)
 }
 
@@ -27,7 +27,7 @@ makeCacheMatrix <- function(x = matrix()) {
 ## inverse from the cache.
 
 cacheSolve <- function(x, ...) {
-        inv = x$getinv()
+        inv <- x$getinv()
 
         if (!is.null(inv)){
 
@@ -35,9 +35,32 @@ cacheSolve <- function(x, ...) {
             return(inv)
         }
 
-        mat.data = x$get()
-        inv = solve(mat.data, ...)
-
+        data <- x$get()
+        inv <- solve(data, ...)
         x$setinv(inv)
         inv
 }
+
+test = function(mat){
+        ## @mat: an invertible matrix
+        
+        temp = makeCacheMatrix(mat)
+        
+        start.time = Sys.time()
+        cacheSolve(temp)
+        dur = Sys.time() - start.time
+        print(dur)
+        
+        start.time = Sys.time()
+        cacheSolve(temp)
+        dur = Sys.time() - start.time
+        print(dur)
+}
+
+set.seed(1110201)
+r = rnorm(1000000)
+mat1 = matrix(r, nrow=1000, ncol=1000)
+test(mat1)
+
+test10 <- makeCacheMatrix(mat1)
+cacheSolve(test10)
